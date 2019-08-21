@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use App\Application\Actions\User\ListUsersAction;
 use App\Application\Actions\User\ViewUserAction;
+use App\Application\Controllers\Usuarios;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -19,5 +20,9 @@ return function (App $app) {
     $app->group('/users', function (Group $group) use ($container) {
         $group->get('', ListUsersAction::class);
         $group->get('/{id}', ViewUserAction::class);
+    });
+
+    $app->group('/test', function (Group $group) use ($container) {
+        $group->get('', Usuarios::class);
     });
 };

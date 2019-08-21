@@ -23,6 +23,6 @@ return function (ContainerBuilder $containerBuilder) {
             $logger->pushHandler($handler);
 
             return $logger;
-        },
+        }
     ]);
 };
