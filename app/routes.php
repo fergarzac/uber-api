@@ -3,26 +3,32 @@ declare(strict_types=1);
 
 use App\Application\Actions\User\ListUsersAction;
 use App\Application\Actions\User\ViewUserAction;
-use App\Application\Controllers\Usuarios;
+use App\Application\Controllers\UsuariosController;
+use App\Application\Controllers\VehiculoController;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
-
+use App\Application\Middleware\SessionMiddleware;
+use App\Application\Middleware\CorsEnabled;
 return function (App $app) {
     $container = $app->getContainer();
 
     $app->get('/', function (Request $request, Response $response) {
         $response->getBody()->write('Hello world!');
         return $response;
-    });
+    })->add(SessionMiddleware::class);
 
-    $app->group('/users', function (Group $group) use ($container) {
-        $group->get('', ListUsersAction::class);
-        $group->get('/{id}', ViewUserAction::class);
-    });
 
-    $app->group('/test', function (Group $group) use ($container) {
-        $group->get('', Usuarios::class);
-    });
+    $app->group('/users/', function (Group $group) use ($container) {
+        $group->get('all', UsuariosController::class . '::allUsers');
+        $group->post('login', UsuariosController::class . '::login');
+        $group->post('add', UsuariosController::class . '::addUser');
+    })->add(CorsEnabled::class);
+
+    $app->group('/vehiculos/', function (Group $group) use ($container) {
+        $group->get('all', VehiculoController::class . '::allVehiculos');
+        $group->post('id', VehiculoController::class . '::getVehiculo');
+        $group->post('add', VehiculoController::class . '::addVehiculo');
+    })->add(CorsEnabled::class);
 };
