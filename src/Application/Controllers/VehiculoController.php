@@ -25,7 +25,12 @@ class VehiculoController
         try {
             
             $parsedBody = $request->getParsedBody();
-            $json = array_key_first($parsedBody);
+            if (function_exists('array_key_first')) {
+                $json = array_key_first($parsedBody);
+            }else{
+                $keys = array_keys($parsedBody);
+                $json = $keys[0];
+            }
             $data_json = json_decode($json, true);
             if(self::validateId($data_json)) {
                 $vehiculos = new Vehiculos();
@@ -77,7 +82,12 @@ class VehiculoController
     {
         try {
             $parsedBody = $request->getParsedBody();
-            $json = array_key_first($parsedBody);
+            if (function_exists('array_key_first')) {
+                $json = array_key_first($parsedBody);
+            }else{
+                $keys = array_keys($parsedBody);
+                $json = $keys[0];
+            }
             $data_json = json_decode($json, true);
             if(self::validateData($data_json)) {
                 $vehiculos = new Vehiculos();
