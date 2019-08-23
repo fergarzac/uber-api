@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpNotFoundException;
-use App\Application\Models\Usuarios;
+use App\Application\Models\Choferes;
 class ChoferesController
 {
 
@@ -20,21 +20,23 @@ class ChoferesController
      * @throws HttpNotFoundException
      * @throws HttpBadRequestException
      */
-    public static function login(Request $request, Response $response, $args): Response
+    public static function getChofer(Request $request, Response $response, $args): Response
     {
         try {
+            
             $parsedBody = $request->getParsedBody();
             $json = array_key_first($parsedBody);
             $data_json = json_decode($json, true);
-            if(self::validateDataLogin($data_json)) {
-                $usuarios = new Usuarios();
-                $payload = $usuarios->getUser($data_json);
+            if(self::validateId($data_json)) {
+                $choferes = new Choferes();
+                $payload = $choferes->getChofer($data_json);
                 $response->getBody()->write($payload);
             }else {
-                $data = array('status' => 3, 'data' => $data_json);
+                $data = array('status' => 3, 'data' => $parsedBody);
                 $payload = json_encode($data);
                 $response->getBody()->write($payload);
             }
+            
         } catch (DomainRecordNotFoundException $e) {
             throw new HttpNotFoundException($this->request, $e->getMessage());
         }
@@ -50,11 +52,11 @@ class ChoferesController
      * @throws HttpNotFoundException
      * @throws HttpBadRequestException
      */
-    public static function allUsers(Request $request, Response $response, $args): Response
+    public static function allChoferes(Request $request, Response $response, $args): Response
     {
         try {
-            $usuarios = new Usuarios();
-            $response->getBody()->write($usuarios->getUsuarios());
+            $choferes = new Choferes();
+            $response->getBody()->write($choferes->getChoferes());
             return $response
                         ->withHeader('Content-Type', 'application/json')
                         ->withStatus(201);
@@ -71,18 +73,21 @@ class ChoferesController
      * @throws HttpNotFoundException
      * @throws HttpBadRequestException
      */
-    public static function addUser(Request $request, Response $response, $args): Response
+    public static function addChofer(Request $request, Response $response, $args): Response
     {
         try {
             $parsedBody = $request->getParsedBody();
-            if(self::validateData($parsedBody)) {
-                $usuarios = new Usuarios();
-                $response->getBody()->write($usuarios->addUsuarios($parsedBody));
+            $json = array_key_first($parsedBody);
+            $data_json = json_decode($json, true);
+            if(self::validateData($data_json)) {
+                $choferes = new Choferes();
+                $response->getBody()->write($choferes->addChofer($data_json));
             }else {
                 $data = array('status' => 3);
                 $payload = json_encode($data);
                 $response->getBody()->write($payload);
             }
+            
             return $response
                         ->withHeader('Content-Type', 'application/json')
                         ->withStatus(201);
@@ -91,10 +96,10 @@ class ChoferesController
         }
     }
 
-    public static function validateDataLogin($data) {
-        return isset($data['usuario']) && !empty($data['usuario']) && isset($data['contraseña']) && !empty($data['contraseña']);
+    public static function validateId($data) {
+        return isset($data['id']) && !empty($data['id']);
     }
     public static function validateData($data) {
-        return isset($data['nombre']) && !empty($data['nombre']) && isset($data['usuario']) && !empty($data['usuario']) && isset($data['contraseña']) && !empty($data['contraseña']);
+        return isset($data['nombre']) && !empty($data['nombre']) && isset($data['direccion']) && !empty($data['direccion']) && isset($data['telefono_1']) && !empty($data['telefono_1']) && isset($data['no_licencia']) && !empty($data['no_licencia']) && isset($data['monto_fianza']) && !empty($data['monto_fianza']) && isset($data['referencia_1']) && !empty($data['referencia_1']) && isset($data['referencia_2']) && !empty($data['referencia_2']) && isset($data['id_uber']) && !empty($data['id_uber']);
     }
 }

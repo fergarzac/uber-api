@@ -48,28 +48,21 @@ class Choferes {
     public function addChofer($data) {
         try {
             $pdo = $this->con->getConnection();
-            $stmt = $pdo->prepare("INSERT INTO Choferes(nombre, direccion, telefono_1, telefono_2, no_licencia, monto_fianza, referencia_1, referencia_2, id_uber, foto_id, foto_licencia, foto_casa, foto_contrato, foto_uber, fecha, ubicacion) 
-                                    VALUES (:nombre, :direccion, :telefono_1, :telefono_2, :no_licencia, :monto_fianza, :referencia_1, :referencia_2, :id_uber, :foto_id, :foto_licencia, :foto_casa, :foto_contrato, :foto_uber, :fecha, :ubicacion");
+            $stmt = $pdo->prepare("INSERT INTO Choferes(nombre, direccion, telefono_1, telefono_2, no_licencia, monto_fianza, referencia_1, referencia_2, id_uber) 
+                                    VALUES (:nombre, :direccion, :telefono_1, :telefono_2, :no_licencia, :monto_fianza, :referencia_1, :referencia_2, :id_uber)");
             $stmt->bindValue(':nombre', $data['nombre'], \PDO::PARAM_STR);
             $stmt->bindValue(':direccion', $data['direccion'], \PDO::PARAM_STR);
             $stmt->bindValue(':telefono_1', $data['telefono_1'], \PDO::PARAM_STR);
-            $stmt->bindValue(':telefono_2', $data['telefono_2'], \PDO::PARAM_STR);
+            $stmt->bindValue(':telefono_2', '', \PDO::PARAM_STR);
             $stmt->bindValue(':no_licencia', $data['no_licencia'], \PDO::PARAM_STR);
             $stmt->bindValue(':monto_fianza', $data['monto_fianza'], \PDO::PARAM_STR);
             $stmt->bindValue(':referencia_1', $data['referencia_1'], \PDO::PARAM_STR);
             $stmt->bindValue(':referencia_2', $data['referencia_2'], \PDO::PARAM_STR);
             $stmt->bindValue(':id_uber', $data['id_uber'], \PDO::PARAM_STR);
-            $stmt->bindValue(':foto_id', $data['foto_id'], \PDO::PARAM_STR);
-            $stmt->bindValue(':foto_licencia', $data['foto_licencia'], \PDO::PARAM_STR);
-            $stmt->bindValue(':foto_casa', $data['foto_casa'], \PDO::PARAM_STR);
-            $stmt->bindValue(':foto_contrato', $data['foto_contrato'], \PDO::PARAM_STR);
-            $stmt->bindValue(':foto_uber', $data['foto_uber'], \PDO::PARAM_STR);
-            $stmt->bindValue(':fecha', $data['fecha']);
-            $stmt->bindValue(':ubicacion', $data['ubicacion'], \PDO::PARAM_STR);
             if($stmt->execute()) {
                 $data = ['status' => 1];
             }else {
-                $data = ['status' => 0];
+                $data = ['status' => 0, 'error' => $stmt->errorInfo()];
             }
         }catch(\PDOException $e) {
             $data = ['status' => 0, 'error' => $e->getMessage()];
