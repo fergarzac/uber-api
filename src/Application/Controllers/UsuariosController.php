@@ -24,16 +24,9 @@ class UsuariosController
     {
         try {
             $parsedBody = $request->getParsedBody();
-            if (function_exists('array_key_first')) {
-                $json = array_key_first($parsedBody);
-            }else{
-                $keys = array_keys($parsedBody);
-                $json = $keys[0];
-            }
-            $data_json = json_decode($json, true);
-            if(self::validateDataLogin($data_json)) {
+            if(self::validateDataLogin($parsedBody)) {
                 $usuarios = new Usuarios();
-                $payload = $usuarios->getUser($data_json);
+                $payload = $usuarios->getUser($parsedBody);
                 
                 $response->getBody()->write($payload);
             }else {
@@ -41,7 +34,6 @@ class UsuariosController
                 $payload = json_encode($data);
                 $response->getBody()->write($payload);
             }
-
         } catch (DomainRecordNotFoundException $e) {
             throw new HttpNotFoundException($this->request, $e->getMessage());
         }
@@ -82,16 +74,9 @@ class UsuariosController
     {
         try {
             $parsedBody = $request->getParsedBody();
-            if (function_exists('array_key_first')) {
-                $json = array_key_first($parsedBody);
-            }else{
-                $keys = array_keys($parsedBody);
-                $json = $keys[0];
-            }
-            $data_json = json_decode($json, true);
-            if(self::validateData($data_json)) {
+            if(self::validateData($parsedBody)) {
                 $usuarios = new Usuarios();
-                $response->getBody()->write($usuarios->addUsuarios($data_json));
+                $response->getBody()->write($usuarios->addUsuarios($parsedBody));
             }else {
                 $data = array('status' => 3);
                 $payload = json_encode($data);

@@ -78,20 +78,42 @@ class ChoferesController
      * @throws HttpNotFoundException
      * @throws HttpBadRequestException
      */
+    public static function addChofer1(Request $request, Response $response, $args): Response
+    {
+        try {
+            $parsedBody = $request->getParsedBody();
+            if(self::validateData($parsedBody)) {
+                $choferes = new Choferes();
+                $response->getBody()->write($choferes->addChofer($parsedBody));
+            }else {
+                $data = array('status' => 3);
+                $payload = json_encode($data);
+                $response->getBody()->write($payload);
+            }
+            
+            return $response
+                        ->withHeader('Content-Type', 'application/json')
+                        ->withStatus(201);
+        } catch (DomainRecordNotFoundException $e) {
+            throw new HttpNotFoundException($this->request, $e->getMessage());
+        }
+    }
+
+    /**
+     * @param Request  $request
+     * @param Response $response
+     * @param array    $args
+     * @return Response
+     * @throws HttpNotFoundException
+     * @throws HttpBadRequestException
+     */
     public static function addChofer(Request $request, Response $response, $args): Response
     {
         try {
             $parsedBody = $request->getParsedBody();
-            if (function_exists('array_key_first')) {
-                $json = array_key_first($parsedBody);
-            }else{
-                $keys = array_keys($parsedBody);
-                $json = $keys[0];
-            }
-            $data_json = json_decode($json, true);
-            if(self::validateData($data_json)) {
+            if(self::validateData($parsedBody)) {
                 $choferes = new Choferes();
-                $response->getBody()->write($choferes->addChofer($data_json));
+                $response->getBody()->write($choferes->addChofer($parsedBody));
             }else {
                 $data = array('status' => 3);
                 $payload = json_encode($data);

@@ -25,16 +25,9 @@ class VehiculoController
         try {
             
             $parsedBody = $request->getParsedBody();
-            if (function_exists('array_key_first')) {
-                $json = array_key_first($parsedBody);
-            }else{
-                $keys = array_keys($parsedBody);
-                $json = $keys[0];
-            }
-            $data_json = json_decode($json, true);
-            if(self::validateId($data_json)) {
+            if(self::validateId($parsedBody)) {
                 $vehiculos = new Vehiculos();
-                $payload = $vehiculos->getVehiculo($data_json);
+                $payload = $vehiculos->getVehiculo($parsedBody);
                 $response->getBody()->write($payload);
             }else {
                 $data = array('status' => 3, 'data' => $parsedBody);
@@ -82,16 +75,9 @@ class VehiculoController
     {
         try {
             $parsedBody = $request->getParsedBody();
-            if (function_exists('array_key_first')) {
-                $json = array_key_first($parsedBody);
-            }else{
-                $keys = array_keys($parsedBody);
-                $json = $keys[0];
-            }
-            $data_json = json_decode($json, true);
-            if(self::validateData($data_json)) {
+            if(self::validateData($parsedBody)) {
                 $vehiculos = new Vehiculos();
-                $response->getBody()->write($vehiculos->addVehiculo($data_json));
+                $response->getBody()->write($vehiculos->addVehiculo($parsedBody));
             }else {
                 $data = array('status' => 3);
                 $payload = json_encode($data);

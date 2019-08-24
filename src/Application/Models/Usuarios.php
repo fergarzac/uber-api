@@ -37,7 +37,7 @@ class Usuarios {
             $result = $stmt->fetch(\PDO::FETCH_ASSOC);
             $rows = $stmt->rowCount();
             if($rows > 0) {
-                $data = ['status' => 1, 'data' => $result['idusuario'], 'nombre' => $result['Nombre'] , 'token' => $result['token']];
+                $data = ['status' => 1, 'data' => $result['idusuario'], 'nombre' => $result['nombre'] , 'token' => $result['token']];
             }else {
                 $data = ['status' => 0];
             }
