@@ -14,7 +14,6 @@ use App\Application\Middleware\SessionMiddleware;
 use App\Application\Middleware\CorsEnabled;
 return function (App $app) {
     $container = $app->getContainer();
-
     $app->get('/', function (Request $request, Response $response) {
         $response->getBody()->write('Hello world!');
         return $response;

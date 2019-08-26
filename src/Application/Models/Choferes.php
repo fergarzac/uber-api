@@ -45,11 +45,11 @@ class Choferes {
         return json_encode($data);
     }
 
-    public function addChofer($data) {
+    public function addChofer($data, $imagen = '') {
         try {
             $pdo = $this->con->getConnection();
-            $stmt = $pdo->prepare("INSERT INTO Choferes(nombre, direccion, telefono_1, telefono_2, no_licencia, monto_fianza, referencia_1, referencia_2, id_uber) 
-                                    VALUES (:nombre, :direccion, :telefono_1, :telefono_2, :no_licencia, :monto_fianza, :referencia_1, :referencia_2, :id_uber)");
+            $stmt = $pdo->prepare("INSERT INTO Choferes(nombre, direccion, telefono_1, telefono_2, no_licencia, monto_fianza, referencia_1, referencia_2, id_uber, foto_id) 
+                                    VALUES (:nombre, :direccion, :telefono_1, :telefono_2, :no_licencia, :monto_fianza, :referencia_1, :referencia_2, :id_uber, :foto_id)");
             $stmt->bindValue(':nombre', $data['nombre'], \PDO::PARAM_STR);
             $stmt->bindValue(':direccion', $data['direccion'], \PDO::PARAM_STR);
             $stmt->bindValue(':telefono_1', $data['telefono_1'], \PDO::PARAM_STR);
@@ -59,8 +59,9 @@ class Choferes {
             $stmt->bindValue(':referencia_1', $data['referencia_1'], \PDO::PARAM_STR);
             $stmt->bindValue(':referencia_2', $data['referencia_2'], \PDO::PARAM_STR);
             $stmt->bindValue(':id_uber', $data['id_uber'], \PDO::PARAM_STR);
+            $stmt->bindValue(':foto_id', $imagen, \PDO::PARAM_STR);
             if($stmt->execute()) {
-                $data = ['status' => 1];
+                $data = ['status' => 1, 'img' => $imagen];
             }else {
                 $data = ['status' => 0, 'error' => $stmt->errorInfo()];
             }

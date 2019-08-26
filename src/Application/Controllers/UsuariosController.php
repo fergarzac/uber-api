@@ -30,7 +30,7 @@ class UsuariosController
                 
                 $response->getBody()->write($payload);
             }else {
-                $data = array('status' => 3, 'data' => $data_json);
+                $data = array('status' => 3, 'data' => $parsedBody);
                 $payload = json_encode($data);
                 $response->getBody()->write($payload);
             }
@@ -82,6 +82,7 @@ class UsuariosController
                 $payload = json_encode($data);
                 $response->getBody()->write($payload);
             }
+            
             return $response
                         ->withHeader('Content-Type', 'application/json')
                         ->withStatus(201);
