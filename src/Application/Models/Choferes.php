@@ -53,7 +53,7 @@ class Choferes {
             $stmt->bindValue(':nombre', $data['nombre'], \PDO::PARAM_STR);
             $stmt->bindValue(':direccion', $data['direccion'], \PDO::PARAM_STR);
             $stmt->bindValue(':telefono_1', $data['telefono_1'], \PDO::PARAM_STR);
-            $stmt->bindValue(':telefono_2', '', \PDO::PARAM_STR);
+            $stmt->bindValue(':telefono_2', $data['telefono_2'], \PDO::PARAM_STR);
             $stmt->bindValue(':no_licencia', $data['no_licencia'], \PDO::PARAM_STR);
             $stmt->bindValue(':monto_fianza', $data['monto_fianza'], \PDO::PARAM_STR);
             $stmt->bindValue(':referencia_1', $data['referencia_1'], \PDO::PARAM_STR);
@@ -63,7 +63,7 @@ class Choferes {
             if($stmt->execute()) {
                 $data = ['status' => 1, 'img' => $imagen];
             }else {
-                $data = ['status' => 0, 'error' => $stmt->errorInfo()];
+                $data = ['status' => 0, 'error' => $stmt->errorInfo(), 'img' => $imagen];
             }
         }catch(\PDOException $e) {
             $data = ['status' => 0, 'error' => $e->getMessage()];

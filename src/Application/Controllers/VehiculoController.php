@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpNotFoundException;
+use Psr\Http\Message\UploadedFileInterface;
 use App\Application\Models\Vehiculos;
 class VehiculoController
 {
@@ -75,14 +76,24 @@ class VehiculoController
     {
         try {
             $parsedBody = $request->getParsedBody();
+            $files = $request->getUploadedFiles();
             if(self::validateData($parsedBody)) {
+                $filenames = [];
+                foreach ($files as $f => $value) {
+                    $uploadedFile = $value;
+                    if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+                        $directory = __DIR__ . '/../../../public/images';
+                        $filenames[$f] = self::moveUploadedFile($directory, $uploadedFile);
+                    }
+                }
                 $vehiculos = new Vehiculos();
-                $response->getBody()->write($vehiculos->addVehiculo($parsedBody));
+                $response->getBody()->write($vehiculos->addVehiculo($parsedBody, $filenames));
             }else {
                 $data = array('status' => 3);
                 $payload = json_encode($data);
                 $response->getBody()->write($payload);
             }
+            
             return $response
                         ->withHeader('Content-Type', 'application/json')
                         ->withStatus(201);
@@ -96,5 +107,16 @@ class VehiculoController
     }
     public static function validateData($data) {
         return isset($data['marca']) && !empty($data['marca']) && isset($data['linea']) && !empty($data['linea']) && isset($data['version']) && !empty($data['version']) && isset($data['modelo']) && !empty($data['modelo']) && isset($data['color']) && !empty($data['color']) && isset($data['serie']) && !empty($data['serie']) && isset($data['placas']) && !empty($data['placas']);
+    }
+
+    public static function moveUploadedFile($directory, UploadedFileInterface $uploadedFile)
+    {
+        $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+        $basename = bin2hex(random_bytes(8)); // see http://php.net/manual/en/function.random-bytes.php
+        $filename = sprintf('%s.%0.8s', $basename, $extension);
+
+        $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
+
+        return $filename;
     }
 }

@@ -116,19 +116,18 @@ class ChoferesController
             $filecharged = false;
             
             if(self::validateData($parsedBody)) {
+                $filename = '';
                 if(isset($files['fotoperfil']) && !empty($files['fotoperfil'])){
-                    $filename = '';
                     $uploadedFile = $files['fotoperfil'];
                     if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-                        $directory = __DIR__ . '/uploads';
+                        $directory = __DIR__ . '/../../../public/images';
                         $filename = self::moveUploadedFile($directory, $uploadedFile);
-                        $filecharged = true;
                     }
                 }
                 $choferes = new Choferes();
                 $response->getBody()->write($choferes->addChofer($parsedBody, $filename));
             }else {
-                $data = array('status' => 3, 'file' => $filecharged);
+                $data = array('status' => 3);
                 $payload = json_encode($data);
                 $response->getBody()->write($payload);
             }
@@ -156,6 +155,6 @@ class ChoferesController
 
         $uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $filename);
 
-        return $directory . DIRECTORY_SEPARATOR . $filename;
+        return $filename;
     }
 }

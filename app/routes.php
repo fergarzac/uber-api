@@ -19,6 +19,39 @@ return function (App $app) {
         return $response;
     })->add(SessionMiddleware::class);
 
+    $app->get('/img[/[{data}]]', function (Request $request, Response $response, $args) {
+        $data = isset($args['data']) ? $args['data'] : '';
+        if(empty($data)) {
+            $response->getBody()->write('Hello world!');
+            return $response;
+        }else {
+            $directory = __DIR__ . '\\..\\public\\images\\'.$data;
+            $extensiones = ['jpg', 'gif', 'png', 'jpeg'];
+            $resourceFound = false;
+            $ext = '';
+            try {
+                foreach($extensiones as $ex => $val) {
+                    $file_handle = @fopen($directory . '.' . $val ,"r");
+                    if ($file_handle) {
+                        $ext = $val;
+                        $resourceFound = true;
+                        break;
+                    }
+                }
+                if (!$resourceFound) {
+                    throw new Exception('Failed to open uploaded file');
+                }else {
+                    $image = file_get_contents($directory . '.' . $ext);
+                    $response->getBody()->write($image);
+                    return $response->withHeader('Content-Type', FILEINFO_MIME_TYPE);
+                }
+            }catch(Exception $e) {
+                $response->getBody()->write($e->getMessage());
+                return $response;
+            }
+        }
+        
+    })->add(CorsEnabled::class);
 
     $app->group('/users/', function (Group $group) use ($container) {
         $group->get('all', UsuariosController::class . '::allUsers');

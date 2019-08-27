@@ -45,11 +45,11 @@ class Vehiculos {
         return json_encode($data);
     }
 
-    public function addVehiculo($data) {
+    public function addVehiculo($data, $filenames = []) {
         try {
             $pdo = $this->con->getConnection();
-            $stmt = $pdo->prepare("INSERT INTO Vehiculo(marca, linea, version, modelo, color, serie, placas, idchofer) 
-            VALUES (:marca, :linea, :version, :modelo, :color, :serie, :placas, 0)");
+            $stmt = $pdo->prepare("INSERT INTO Vehiculo(marca, linea, version, modelo, color, serie, placas, pedimento, tarjeta_circulacion, seguro, factura, idchofer) 
+            VALUES (:marca, :linea, :version, :modelo, :color, :serie, :placas,:pedimento, :tarjeta, :seguro, :factura, 0)");
             $stmt->bindValue(':marca', $data['marca'], \PDO::PARAM_STR);
             $stmt->bindValue(':linea', $data['linea'], \PDO::PARAM_STR);
             $stmt->bindValue(':version', $data['version'], \PDO::PARAM_STR);
@@ -57,10 +57,14 @@ class Vehiculos {
             $stmt->bindValue(':color', $data['color'], \PDO::PARAM_STR);
             $stmt->bindValue(':serie', $data['serie'], \PDO::PARAM_STR);
             $stmt->bindValue(':placas', $data['placas'], \PDO::PARAM_STR);
+            $stmt->bindValue(':pedimento', isset($filenames['pedimento']) ? $filenames['pedimento']: '', \PDO::PARAM_STR);
+            $stmt->bindValue(':tarjeta', isset($filenames['tarjeta']) ? $filenames['tarjeta']: '', \PDO::PARAM_STR);
+            $stmt->bindValue(':seguro', isset($filenames['seguro']) ? $filenames['seguro']: '', \PDO::PARAM_STR);
+            $stmt->bindValue(':factura', isset($filenames['factura']) ? $filenames['factura']: '', \PDO::PARAM_STR);
             if($stmt->execute()) {
-                $data = ['status' => 1];
+                $data = ['status' => 1, 'files' => $filenames];
             }else {
-                $data = ['status' => 0];
+                $data = ['status' => 0, 'files' => $filenames];
             }
         }catch(\PDOException $e) {
             $data = ['status' => 0, 'error' => $e->getMessage()];
