@@ -6,6 +6,7 @@ use App\Application\Actions\User\ViewUserAction;
 use App\Application\Controllers\UsuariosController;
 use App\Application\Controllers\VehiculoController;
 use App\Application\Controllers\ChoferesController;
+use App\Application\Controllers\RevisionController;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -69,5 +70,12 @@ return function (App $app) {
         $group->get('all', ChoferesController::class . '::allChoferes');
         $group->post('id', ChoferesController::class . '::getChofer');
         $group->post('add', ChoferesController::class . '::addChofer');
+    })->add(CorsEnabled::class);
+
+    $app->group('/revisiones/', function (Group $group) use ($container) {
+        $group->post('all', RevisionController::class . '::allRevisiones');
+        $group->post('id', RevisionController::class . '::getRevision');
+        $group->post('week', RevisionController::class . '::getRevisionWeekly');
+        $group->post('add', RevisionController::class . '::addRevision');
     })->add(CorsEnabled::class);
 };

@@ -10,6 +10,7 @@ use Slim\Exception\HttpBadRequestException;
 use Slim\Exception\HttpNotFoundException;
 use Psr\Http\Message\UploadedFileInterface;
 use App\Application\Models\Vehiculos;
+use App\Application\Models\Revisiones;
 class VehiculoController
 {
 
@@ -101,6 +102,9 @@ class VehiculoController
             throw new HttpNotFoundException($this->request, $e->getMessage());
         }
     }
+
+
+
 
     public static function validateId($data) {
         return isset($data['id']) && !empty($data['id']);
