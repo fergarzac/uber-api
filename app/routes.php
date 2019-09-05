@@ -40,15 +40,17 @@ return function (App $app) {
                     }
                 }
                 if (!$resourceFound) {
-                    throw new Exception('Failed to open uploaded file');
+                    throw new Exception('Failed to open uploaded file', 200);
                 }else {
                     $image = file_get_contents($directory . '.' . $ext);
                     $response->getBody()->write($image);
                     return $response->withHeader('Content-Type', FILEINFO_MIME_TYPE);
                 }
             }catch(Exception $e) {
-                $response->getBody()->write($e->getMessage());
-                return $response;
+                $data = array('status' => 0, 'error' => $e->getMessage());
+                $payload = json_encode($data);
+                $response->getBody()->write($payload);
+                return $response->withHeader('Content-Type', 'application/json');
             }
         }
         
@@ -69,13 +71,17 @@ return function (App $app) {
     $app->group('/choferes/', function (Group $group) use ($container) {
         $group->get('all', ChoferesController::class . '::allChoferes');
         $group->post('id', ChoferesController::class . '::getChofer');
+        $group->post('buscar', ChoferesController::class . '::buscarChofer');
         $group->post('add', ChoferesController::class . '::addChofer');
     })->add(CorsEnabled::class);
 
     $app->group('/revisiones/', function (Group $group) use ($container) {
         $group->post('all', RevisionController::class . '::allRevisiones');
-        $group->post('id', RevisionController::class . '::getRevision');
+        $group->get('id', RevisionController::class . '::getRevision');
         $group->post('week', RevisionController::class . '::getRevisionWeekly');
+        $group->post('chofer', RevisionController::class . '::getRevisionChofer');
+        $group->post('ingresos', RevisionController::class . '::getIngresos');
         $group->post('add', RevisionController::class . '::addRevision');
+        $group->get('descargar/[{id}]', RevisionController::class . '::descargarReporte');
     })->add(CorsEnabled::class);
 };

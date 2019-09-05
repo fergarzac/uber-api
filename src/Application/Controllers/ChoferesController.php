@@ -71,6 +71,27 @@ class ChoferesController
         }
     }
 
+    public static function buscarChofer(Request $request, Response $response, $args): Response
+    {
+        try {
+            $parsedBody = $request->getParsedBody();
+            if(isset($parsedBody['nombre']) && !empty($parsedBody['nombre'])) {
+                $choferes = new Choferes();
+                $payload = $choferes->buscar($parsedBody['nombre']);
+                $response->getBody()->write($payload);
+            }else {
+                $data = array('status' => 3, 'data' => $parsedBody);
+                $payload = json_encode($data);
+                $response->getBody()->write($payload);
+            }
+            return $response
+                        ->withHeader('Content-Type', 'application/json')
+                        ->withStatus(201);
+        } catch (DomainRecordNotFoundException $e) {
+            throw new HttpNotFoundException($this->request, $e->getMessage());
+        }
+    }
+
     /**
      * @param Request  $request
      * @param Response $response

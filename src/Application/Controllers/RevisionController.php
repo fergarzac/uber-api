@@ -78,6 +78,54 @@ class RevisionController
         }
     }
 
+    public static function getIngresos(Request $request, Response $response, $args): Response
+    {
+        try {
+            $parsedBody = $request->getParsedBody();
+            if(isset($parsedBody['mes']) && !empty($parsedBody['mes'])) {
+                $revisiones = new Revisiones();
+                if(isset($parsedBody['id']) && !empty($parsedBody['id'])) {
+                    $response->getBody()->write($revisiones->getIngresos($parsedBody['mes'], $parsedBody['id']));
+                }else {
+                    $response->getBody()->write($revisiones->getIngresos($parsedBody['mes']));
+                }
+                
+            }else {
+                $data = array('status' => 3);
+                $payload = json_encode($data);
+                $response->getBody()->write($payload);
+            }
+            
+            return $response
+                        ->withHeader('Content-Type', 'application/json')
+                        ->withStatus(201);
+        } catch (DomainRecordNotFoundException $e) {
+            throw new HttpNotFoundException($this->request, $e->getMessage());
+        }
+    }
+
+    public static function getRevisionChofer(Request $request, Response $response, $args): Response
+    {
+        try {
+            $parsedBody = $request->getParsedBody();
+            if(isset($parsedBody['id']) && !empty($parsedBody['id'])) {
+                $revisiones = new Revisiones();
+                $mes = isset($parsedBody['mes']) ? $parsedBody['mes'] : '';
+                $response->getBody()->write($revisiones->getRevisionChofer($parsedBody['id'], $mes));
+                
+            }else {
+                $data = array('status' => 3);
+                $payload = json_encode($data);
+                $response->getBody()->write($payload);
+            }
+            return $response
+                        ->withHeader('Content-Type', 'application/json')
+                        ->withStatus(201);
+        } catch (DomainRecordNotFoundException $e) {
+            throw new HttpNotFoundException($this->request, $e->getMessage());
+        }
+    }
+
     public static function addRevision(Request $request, Response $response, $args) : Response
     {
         try {
@@ -113,6 +161,37 @@ class RevisionController
             if($opciones != '') {
                 $revisiones = new Revisiones();
                 $response->getBody()->write($revisiones->addRevisiones($data, $json, $opciones, $parsedBody['idvehiculo']));
+            }else {
+                $data = array('status' => 3);
+                $payload = json_encode($data);
+                $response->getBody()->write($payload);
+            }
+
+            return $response
+                        ->withHeader('Content-Type', 'application/json')
+                        ->withStatus(201);
+        } catch (DomainRecordNotFoundException $e) {
+            throw new HttpNotFoundException($this->request, $e->getMessage());
+        }
+    }
+
+    public static function descargarReporte(Request $request, Response $response, $args): Response
+    {
+        try {
+            $parsedBody = $args;
+            if(isset($parsedBody['id']) && !empty($parsedBody['id'])) {
+                $revisiones = new Revisiones();
+                $file = $revisiones->downloadReporte($parsedBody['id']);
+                if($file['status'] == 1) {
+                    $content = file_get_contents($file['ruta']);
+                    $response->getBody()->write($content);
+                    return $response->withHeader('Content-Type', FILEINFO_MIME_TYPE)
+                                    ->withHeader('Content-Disposition', 'inline; filename="'.$parsedBody['id'].'-'.$file['name'].'');
+                }else {
+                    $response->getBody()->write(json_encode($file));
+                    return $response
+                        ->withHeader('Content-Type', 'application/json');
+                }
             }else {
                 $data = array('status' => 3);
                 $payload = json_encode($data);

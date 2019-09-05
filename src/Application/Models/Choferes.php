@@ -25,6 +25,22 @@ class Choferes {
         return json_encode($data);
     }
 
+    public function buscar($nombre) {
+        try {
+            $pdo = $this->con->getConnection();
+            $stmt = $pdo->prepare("SELECT * FROM Choferes WHERE nombre LIKE :nombre AND (SELECT idvehiculo FROM vehiculo WHERE idchofer = choferes.idchofer) IS NOT NULL");
+            $stmt->bindValue(':nombre','%'. $nombre.'%', \PDO::PARAM_STR);
+            $stmt->execute();
+            $data = [];
+            while ($fila = $stmt->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
+                array_push($data, $fila);
+            }
+        }catch(\PDOException $e) {
+            $data = ['status' => 0, 'error' => $e->getMessage()];
+        }
+        return json_encode($data);
+    }
+
     public function getChofer($data) {
         try {
             $id = $data['id'];
